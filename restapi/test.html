@@ -1,0 +1,77 @@
+<html>
+<head>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+	$(document)
+			.ready(
+					function() {
+						var output = "";
+						var apis = [];
+						var headers = {};
+
+						apis
+								.push("https://api.csas.cz/sandbox/webapi/api/v1/exchangerates");
+						apis
+								.push("https://api.csas.cz/sandbox/webapi/api/v1/exchangerates?date=2014-04-24");
+						console.log("apis:", apis);
+
+						headers["WEB-API-key"] = "35bd5a35-5909-460e-b3c2-20073d9c4c2e";
+						console.log("headers:", headers);
+
+						ajaxCalls(apis, headers);
+
+						$(document).ajaxComplete(
+								function(event, xhr, settings) {
+									console.log("event", event);
+									console.log(settings.url, settings);
+									console.log("xhr", xhr);
+									console.log("xhr", xhr.responseJSON);
+									output += "<b>" + settings.url
+											+ "</b></br>"
+									if ($.isArray(xhr.responseJSON)) {
+										$.each(xhr.responseJSON, function(
+												index, value) {
+											output += index + "\t"
+													+ value.validFrom + " \t"
+													+ value.shortName + " \t"
+													+ value.currMid + "</br>";
+										});
+									}
+									//logToConsole( "output", output );
+									$("#response").html(output);
+								});
+
+						function ajaxCalls(apis, headers) {
+							$.each(apis, function(index, value) {
+								ajaxCallGetApiStringJSON(value, headers);
+							});
+
+						}
+						function ajaxCallGetApiStringJSON(api_url, headers) {
+							$.ajax(
+									{
+										url : api_url,
+										beforeSend : function(xhr) {
+											$.each(headers,
+													function(header_index,
+															header_value) {
+														xhr.setRequestHeader(
+																header_index,
+																header_value);
+													});
+										}
+									}).done(function(data) {
+								//logToConsole( "data:", data );
+							});
+						}
+
+					});
+</script>
+</head>
+
+
+<body>
+	<div id="response"></div>
+</body>
+</html>
